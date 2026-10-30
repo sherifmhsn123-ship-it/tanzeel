@@ -1,0 +1,68 @@
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+*.jks
+secrets/
+credentials/
+
+# Node / JavaScript
+node_modules/
+dist/
+dist-ssr/
+.vite/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+# Rust / Tauri
+target/
+**/target/
+src-tauri/gen/
+
+# Local data
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+data/
+
+# Build outputs and binaries
+*.msi
+*.exe
+*.nsis
+*.zip
+*.7z
+*.dmg
+*.AppImage
+*.deb
+*.rpm
+release/
+sidecars/binaries/
+
+# Logs and diagnostics
+*.log
+diagnostics/
+crash-reports/
+
+# OS / editor
+Thumbs.db
+Desktop.ini
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.part
