@@ -1,0 +1,212 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Markdown lint
+        run: npx --yes markdownlint-cli2@0.17.2 "**/*.md" "#node_modules"
+
+      - name: Validate workflow syntax
+        run: |
+          docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.12
+
+      - name: Check local links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress --verbose "./**/*.md"
+          fail: true
+
+  foundation:
+    name: Foundation (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify required foundation files
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            "README.md"
+            "AGENTS.md"
+            "LICENSE"
+            "docs/PRD.md"
+            "docs/ARCHITECTURE.md"
+            "docs/ROADMAP.md"
+            "docs/adr/README.md"
+            ".github/workflows/ci.yml"
+            ".github/workflows/pr-policy.yml"
+          )
+          for file in "${required[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "::error file=$file::Missing required foundation file"
+              exit 1
+            fi
+          done
+
+      - name: Verify ADR numbering
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=0
+          for file in docs/adr/[0-9][0-9][0-9][0-9]-*.md; do
+            [ -e "$file" ] || continue
+            name="$(basename "$file")"
+            if ! printf '%s' "$name" | grep -Eq '^[0-9]{4}-[a-z0-9-]+\.md$'; then
+              echo "::error file=$file::Invalid ADR filename"
+              exit 1
+            fi
+            count=$((count + 1))
+          done
+          if [ "$count" -lt 1 ]; then
+            echo "::error::No ADR files found"
+            exit 1
+          fi
+          echo "Found $count ADR files."
+
+      - name: Phase 0 guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          # This guard belongs to Phase 0 only. Phase 1 must remove it when
+          # package.json and Cargo.toml are introduced together with real build
+          # and test commands.
+          if [ -f package.json ] || [ -f Cargo.toml ]; then
+            echo "::error::Application manifests exist. Phase 0 must remain documentation-only."
+            exit 1
+          fi
+          echo "Phase 0 guard passed: no application manifests."
+
+  build-test:
+    name: Build & test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect application manifests
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f package.json ]; then
+            echo "js=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "js=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [ -f Cargo.toml ]; then
+            echo "rust=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "rust=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bootstrap notice
+        if: steps.detect.outputs.js == 'false' && steps.detect.outputs.rust == 'false'
+        shell: bash
+        run: |
+          echo "Phase 0: no application manifests yet."
+          echo "Documentation is validated by the Docs and Foundation jobs."
+          echo "This job will run real build and test commands once Phase 1 adds package.json and Cargo.toml."
+
+      - name: Set up pnpm
+        if: steps.detect.outputs.js == 'true'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Set up Node.js
+        if: steps.detect.outputs.js == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Set up Rust
+        if: steps.detect.outputs.rust == 'true'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Rust
+        if: steps.detect.outputs.rust == 'true'
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install Linux system dependencies
+        if: runner.os == 'Linux' && (steps.detect.outputs.js == 'true' || steps.detect.outputs.rust == 'true')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libgtk-3-dev \
+            libsoup-3.0-dev \
+            libjavascriptcoregtk-4.1-dev \
+            libssl-dev
+
+      - name: Install JavaScript dependencies
+        if: steps.detect.outputs.js == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint, typecheck, test, and build JavaScript
+        if: steps.detect.outputs.js == 'true'
+        run: |
+          pnpm lint
+          pnpm typecheck
+          pnpm test -- --run
+          pnpm build
+
+      - name: Format, lint, test, and build Rust
+        if: steps.detect.outputs.rust == 'true'
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy --workspace --all-targets -- -D warnings
+          cargo test --workspace --all-targets
+          cargo build --workspace
+
+  security:
+    name: Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Secret scan
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.30.1 \
+            detect --source=/repo --no-git --redact --verbose
