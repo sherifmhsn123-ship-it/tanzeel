@@ -24,6 +24,7 @@ test-results/
 target/
 **/target/
 src-tauri/gen/
+**/src-tauri/gen/
 
 # Local data
 *.sqlite

@@ -1,0 +1,52 @@
+{
+  "app": {
+    "name": "Tanzeel",
+    "tagline": "An Arabic-first download manager for Windows",
+    "status": "Phase 1 — shell and settings"
+  },
+  "nav": {
+    "home": "Home",
+    "settings": "Settings",
+    "about": "About",
+    "languageSwitchTo": "Switch to Arabic",
+    "languageCodeArabic": "ع",
+    "languageCodeEnglish": "EN"
+  },
+  "home": {
+    "title": "Welcome to Tanzeel",
+    "description": "An Arabic-first interface for downloading files and videos, private by default and explicit about its limits.",
+    "emptyTitle": "No downloads yet",
+    "emptyBody": "Your downloads will appear here later. Downloading is not enabled in this phase.",
+    "phaseNote": "This phase builds the interface and settings only, with no network access."
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Basic settings saved locally on your device.",
+    "language": "Language",
+    "languageArabic": "Arabic",
+    "languageEnglish": "English",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "Follow system",
+    "downloadDir": "Download folder",
+    "downloadDirHint": "Leave the field empty to use the system default Downloads folder.",
+    "downloadDirPlaceholder": "Example: C:\\Users\\me\\Downloads",
+    "save": "Save settings",
+    "saving": "Saving…",
+    "saved": "Settings saved.",
+    "saveFailed": "Could not save settings. Check the values and try again.",
+    "invalidDir": "Invalid folder path: use an absolute path without control characters, within a reasonable length."
+  },
+  "about": {
+    "title": "About Tanzeel",
+    "description": "An independent functional alternative to a Windows download manager, Arabic-first and open source.",
+    "license": "License",
+    "licenseValue": "GPL-3.0-or-later",
+    "version": "Version",
+    "phase": "Phase",
+    "phaseValue": "Phase 1: shell, language, and settings",
+    "status": "Status",
+    "statusValue": "Under construction — not tested yet"
+  }
+}

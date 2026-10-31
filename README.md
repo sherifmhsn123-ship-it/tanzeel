@@ -2,9 +2,9 @@
 
 > برنامج سطح مكتب لنظام ويندوز لتنزيل الملفات والفيديوهات — عربي أولًا، مع واجهة إنجليزية بضغطة زر.
 
-**الحالة: قيد البناء — المرحلة 0 (ملفات الأساس فقط).**
+**الحالة: قيد البناء — المرحلة 1 (الهيكل واللغة والإعدادات).**
 
-لا يوجد كود تطبيق بعد، ولا توجد أي ميزة مختبرة بعد. كل ما في هذا المستودع الآن هو وثائق وقرارات (بعضها معتمد وبعضها مقترح) وبنية عمل أولية، وينتظر موافقة المالك على القرارات المتبقية قبل الانتقال إلى الكود.
+أُنجزت المرحلة 0 (الوثائق والحوكمة) ودُمجت. يوجد الآن هيكل تطبيق أولي مبني على Tauri 2 وReact وTypeScript ونواة Rust وSQLite: يفتح التطبيق، ويعرض واجهة عربية RTL افتراضيًا، ويبدّل إلى الإنجليزية فورًا، ويحفظ الإعدادات محليًا. **لا يوجد تنزيل ولا اتصال شبكة بعد**، وكل ميزة تنزيل ما زالت **لم تُختبر** لأنها لم تُبنَ. التفاصيل في [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ---
 
@@ -90,6 +90,25 @@
 
 التفاصيل والأسباب في [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) و[docs/adr/](docs/adr/).
 
+## التطوير والاختبار
+
+المتطلبات: Node.js 22 أو أحدث، وpnpm 10.18.3 عبر Corepack، وRust stable مع Visual Studio Build Tools وWebView2 (ويندوز). لا يحتاج تشغيل الاختبارات إلى شبكة.
+
+```bash
+corepack pnpm install --frozen-lockfile
+corepack pnpm lint
+corepack pnpm typecheck
+corepack pnpm test
+corepack pnpm test:i18n
+corepack pnpm build
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace --all-targets
+cargo build --workspace
+```
+
+لتشغيل نافذة Tauri أثناء التطوير: `corepack pnpm tauri dev` (يتطلب Rust وWebView2). المثبّت خارج نطاق المرحلة 1.
+
 ## الوثائق
 
 | الملف | المحتوى |
@@ -124,10 +143,10 @@ Copyright (C) 2026 Tanzeel contributors.
 
 ## English (brief)
 
-**Tanzeel** is a Windows desktop download manager for direct files and videos from YouTube and other supported platforms. It is Arabic-first with an instant English toggle. Planned v1.0 scope includes segmented (multi-connection) acceleration, opt-in browser capture through a WebExtension and native messaging, scheduled downloads, and a bounded single-page link grabber. This repository currently contains **foundation documents only**; no application code and no tested feature exist yet.
+**Tanzeel** is a Windows desktop download manager for direct files and videos from YouTube and other supported platforms. It is Arabic-first with an instant English toggle. Planned v1.0 scope includes segmented (multi-connection) acceleration, opt-in browser capture through a WebExtension and native messaging, scheduled downloads, and a bounded single-page link grabber. This repository now contains the foundation documents plus a Phase 1 scaffold (Tauri 2, React/TypeScript, Rust core, SQLite settings) that opens an Arabic-first interface with an instant English toggle. **No download feature exists or has been tested yet**, and no network request is made.
 
 The project is an independent functional alternative to a locally installed program named “Zagel”, which the owner describes as similar in purpose to IDM (a download manager). It does not use, inspect, copy, or reverse-engineer that program or IDM. Only publicly published information, plus the owner’s general description, may be referenced.
 
-Proposed stack: Tauri 2 + Rust core + React/TypeScript UI + SQLite + managed `yt-dlp`/`ffmpeg` sidecars. Proposed license: GPL-3.0-or-later. All major choices are proposals awaiting owner approval.
+Proposed stack: Tauri 2 + Rust core + React/TypeScript UI + SQLite + managed `yt-dlp`/`ffmpeg` sidecars. The desktop framework, core language, storage, i18n, and testing choices are approved for Phase 1; the download engine and release choices remain proposals awaiting owner approval. License: GPL-3.0-or-later (approved).
 
 Read [AGENTS.md](AGENTS.md) before contributing. No direct pushes to `main`; every change needs a small PR with tests and the prompt that produced it.

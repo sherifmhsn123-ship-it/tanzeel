@@ -1,0 +1,300 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f6f3;
+  --surface: #ffffff;
+  --text: #1b1b18;
+  --muted: #5b5b55;
+  --border: #d8d8d1;
+  --accent: #0f6b4f;
+  --accent-text: #ffffff;
+  --danger: #a12a2a;
+  --radius: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #141513;
+    --surface: #1d1f1c;
+    --text: #ecece7;
+    --muted: #a8a8a0;
+    --border: #33352f;
+    --accent: #4cc79b;
+    --accent-text: #0b231a;
+    --danger: #ff8a8a;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #141513;
+  --surface: #1d1f1c;
+  --text: #ecece7;
+  --muted: #a8a8a0;
+  --border: #33352f;
+  --accent: #4cc79b;
+  --accent-text: #0b231a;
+  --danger: #ff8a8a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-block-size: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', 'Noto Naskh Arabic', 'Noto Sans Arabic', Tahoma, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-loading {
+  padding-block: 48px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.app-shell {
+  max-inline-size: 920px;
+  margin-inline: auto;
+  padding-inline: 24px;
+  padding-block: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.app-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.app-name {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.app-tagline {
+  margin: 0;
+  color: var(--muted);
+}
+
+.language-button {
+  min-inline-size: 52px;
+  padding-inline: 14px;
+  padding-block: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.language-button:hover {
+  border-color: var(--accent);
+}
+
+.app-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-block-end: 1px solid var(--border);
+  padding-block-end: 12px;
+}
+
+.nav-button {
+  padding-inline: 14px;
+  padding-block: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--muted);
+}
+
+.nav-button:hover {
+  color: var(--text);
+}
+
+.nav-button-active {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.app-main {
+  min-block-size: 320px;
+}
+
+.page h1 {
+  margin-block: 0 8px;
+  font-size: 1.35rem;
+}
+
+.page-description {
+  margin-block: 0 20px;
+  color: var(--muted);
+}
+
+.empty-state {
+  padding: 28px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.empty-state h2 {
+  margin-block: 0 6px;
+  font-size: 1.05rem;
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.phase-note {
+  margin-block-start: 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-inline-size: 560px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-weight: 600;
+}
+
+.field input,
+.field select {
+  padding-inline: 12px;
+  padding-block: 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.language-button:focus-visible,
+.nav-button:focus-visible,
+.form-actions button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.field-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.form-actions button {
+  padding-inline: 18px;
+  padding-block: 9px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.form-actions button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.form-status {
+  margin: 0;
+  color: var(--accent);
+}
+
+.form-error {
+  margin: 0;
+  color: var(--danger);
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+
+.info-list div {
+  display: flex;
+  gap: 12px;
+  padding-block-end: 12px;
+  border-block-end: 1px solid var(--border);
+}
+
+.info-list dt {
+  min-inline-size: 110px;
+  color: var(--muted);
+}
+
+.info-list dd {
+  margin: 0;
+}
+
+.app-footer {
+  color: var(--muted);
+  font-size: 0.85rem;
+  border-block-start: 1px solid var(--border);
+  padding-block-start: 12px;
+}
+
+@media (max-width: 600px) {
+  .app-shell {
+    padding-inline: 16px;
+  }
+
+  .info-list div {
+    flex-direction: column;
+    gap: 2px;
+  }
+}
