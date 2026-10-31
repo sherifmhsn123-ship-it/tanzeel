@@ -1,0 +1,17 @@
+{
+  "name": "tanzeel",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tanzeel desktop download manager (Phase 1 scaffold)",
+  "license": "GPL-3.0-or-later",
+  "packageManager": "pnpm@10.18.3",
+  "scripts": {
+    "dev": "pnpm -C apps/desktop dev",
+    "build": "pnpm -C apps/desktop build",
+    "typecheck": "pnpm -C apps/desktop typecheck",
+    "lint": "pnpm -C apps/desktop lint",
+    "test": "pnpm -C apps/desktop exec vitest run",
+    "test:i18n": "pnpm -C apps/desktop exec vitest run src/test/i18n-parity.test.ts",
+    "tauri": "pnpm -C apps/desktop tauri"
+  }
+}
