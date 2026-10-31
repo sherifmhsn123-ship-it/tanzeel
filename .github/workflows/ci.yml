@@ -27,7 +27,7 @@ jobs:
           node-version: 22
 
       - name: Markdown lint
-        run: npx --yes markdownlint-cli2@0.17.2 "**/*.md" "#node_modules"
+        run: npx --yes markdownlint-cli2@0.17.2 "**/*.md" "#**/node_modules/**" "#**/target/**" "#apps/desktop/dist/**" "#apps/desktop/src-tauri/gen/**"
 
       - name: Validate workflow syntax
         run: |
@@ -92,19 +92,6 @@ jobs:
           fi
           echo "Found $count ADR files."
 
-      - name: Phase 0 guard
-        shell: bash
-        run: |
-          set -euo pipefail
-          # This guard belongs to Phase 0 only. Phase 1 must remove it when
-          # package.json and Cargo.toml are introduced together with real build
-          # and test commands.
-          if [ -f package.json ] || [ -f Cargo.toml ]; then
-            echo "::error::Application manifests exist. Phase 0 must remain documentation-only."
-            exit 1
-          fi
-          echo "Phase 0 guard passed: no application manifests."
-
   build-test:
     name: Build & test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -116,55 +103,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Detect application manifests
-        id: detect
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -f package.json ]; then
-            echo "js=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "js=false" >> "$GITHUB_OUTPUT"
-          fi
-          if [ -f Cargo.toml ]; then
-            echo "rust=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "rust=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Bootstrap notice
-        if: steps.detect.outputs.js == 'false' && steps.detect.outputs.rust == 'false'
-        shell: bash
-        run: |
-          echo "Phase 0: no application manifests yet."
-          echo "Documentation is validated by the Docs and Foundation jobs."
-          echo "This job will run real build and test commands once Phase 1 adds package.json and Cargo.toml."
-
       - name: Set up pnpm
-        if: steps.detect.outputs.js == 'true'
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10.18.3
 
       - name: Set up Node.js
-        if: steps.detect.outputs.js == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
       - name: Set up Rust
-        if: steps.detect.outputs.rust == 'true'
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
 
       - name: Cache Rust
-        if: steps.detect.outputs.rust == 'true'
         uses: Swatinem/rust-cache@v2
 
       - name: Install Linux system dependencies
-        if: runner.os == 'Linux' && (steps.detect.outputs.js == 'true' || steps.detect.outputs.rust == 'true')
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -178,19 +137,17 @@ jobs:
             libssl-dev
 
       - name: Install JavaScript dependencies
-        if: steps.detect.outputs.js == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Lint, typecheck, test, and build JavaScript
-        if: steps.detect.outputs.js == 'true'
         run: |
           pnpm lint
           pnpm typecheck
-          pnpm test -- --run
+          pnpm test
+          pnpm test:i18n
           pnpm build
 
       - name: Format, lint, test, and build Rust
-        if: steps.detect.outputs.rust == 'true'
         run: |
           cargo fmt --all -- --check
           cargo clippy --workspace --all-targets -- -D warnings
