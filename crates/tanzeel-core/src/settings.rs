@@ -70,11 +70,33 @@ pub fn validate_settings(settings: &AppSettings) -> Result<(), SettingsError> {
     if directory.trim() != directory {
         return Err(SettingsError::DownloadDirWhitespace);
     }
-    if !directory.is_empty() && !Path::new(directory).is_absolute() {
+    if !directory.is_empty() && !is_absolute_download_directory(directory) {
         return Err(SettingsError::DownloadDirNotAbsolute);
     }
 
     Ok(())
+}
+
+/// Tanzeel targets Windows, but tests run on Linux and macOS too. Accept a
+/// Windows drive or UNC path on any host, and also accept a host-absolute path
+/// so the storage tests can use the platform temporary directory.
+fn is_absolute_download_directory(directory: &str) -> bool {
+    is_windows_absolute(directory) || Path::new(directory).is_absolute()
+}
+
+fn is_windows_absolute(directory: &str) -> bool {
+    let bytes = directory.as_bytes();
+    let drive_absolute = bytes.len() >= 3
+        && bytes[0].is_ascii_alphabetic()
+        && bytes[1] == b':'
+        && (bytes[2] == b'\\' || bytes[2] == b'/');
+
+    let unc_absolute = directory
+        .strip_prefix("\\\\")
+        .and_then(|rest| rest.chars().next())
+        .is_some_and(|first| first != '\\');
+
+    drive_absolute || unc_absolute
 }
 
 #[cfg(test)]
@@ -99,6 +121,26 @@ mod tests {
         };
 
         assert_eq!(validate_settings(&settings), Ok(()));
+    }
+
+    #[test]
+    fn accepts_windows_drive_and_unc_paths_on_every_platform() {
+        for directory in [
+            "C:\\Users\\example\\Downloads",
+            "D:/Downloads",
+            "\\\\server\\share",
+        ] {
+            let settings = AppSettings {
+                download_dir: directory.to_string(),
+                ..AppSettings::default()
+            };
+
+            assert_eq!(
+                validate_settings(&settings),
+                Ok(()),
+                "{directory} should be accepted"
+            );
+        }
     }
 
     #[test]
