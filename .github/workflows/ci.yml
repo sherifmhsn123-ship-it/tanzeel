@@ -44,6 +44,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      # The arm64 macOS pool was cancelling queued jobs; the Intel image keeps macOS coverage available.
       matrix:
         os: [ubuntu-latest, windows-latest, macos-15-intel]
     steps:
@@ -97,6 +98,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      # The arm64 macOS pool was cancelling queued jobs; the Intel image keeps macOS coverage available.
       matrix:
         os: [ubuntu-latest, windows-latest, macos-15-intel]
     steps:
