@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App';
 import i18n, { applyLanguage } from '../i18n';
 import ar from '../i18n/ar.json';
@@ -11,6 +11,10 @@ beforeEach(async () => {
   window.localStorage.clear();
   await i18n.changeLanguage('ar');
   applyLanguage('ar');
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 describe('language switching', () => {
@@ -45,5 +49,21 @@ describe('language switching', () => {
     expect(await screen.findByText(ar.nav.home)).toBeInTheDocument();
     await waitFor(() => expect(document.documentElement.dir).toBe('rtl'));
     expect(document.documentElement.lang).toBe('ar');
+  });
+
+  it('reverts and reports when the header language choice cannot be saved', async () => {
+    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('storage unavailable');
+    });
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(await screen.findByText(ar.nav.home)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: ar.nav.languageSwitchTo }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(ar.settings.saveFailed);
+    expect(screen.getByText(ar.nav.home)).toBeInTheDocument();
+    await waitFor(() => expect(document.documentElement.dir).toBe('rtl'));
+    expect(setItem).toHaveBeenCalledWith(SETTINGS_STORAGE_KEY, expect.any(String));
   });
 });

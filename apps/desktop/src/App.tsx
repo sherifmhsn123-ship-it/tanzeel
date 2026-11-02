@@ -15,6 +15,8 @@ export default function App() {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [activeTab, setActiveTab] = useState<Tab>('home');
   const [ready, setReady] = useState(false);
+  const [languageSaving, setLanguageSaving] = useState(false);
+  const [languageError, setLanguageError] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -50,17 +52,28 @@ export default function App() {
   }, []);
 
   const toggleLanguage = useCallback(async () => {
+    if (languageSaving) {
+      return;
+    }
+
+    const previous = settings;
     const next: Settings = {
       ...settings,
       language: settings.language === 'ar' ? 'en' : 'ar',
     };
+
+    setLanguageSaving(true);
+    setLanguageError(false);
     setSettings(next);
     try {
       await saveSettings(next);
     } catch {
-      // Keep the interface responsive; the settings screen reports save errors.
+      setSettings(previous);
+      setLanguageError(true);
+    } finally {
+      setLanguageSaving(false);
     }
-  }, [settings]);
+  }, [languageSaving, settings]);
 
   if (!ready) {
     return <div className="app-loading">{t('app.name')}</div>;
@@ -78,10 +91,18 @@ export default function App() {
           className="language-button"
           onClick={() => void toggleLanguage()}
           aria-label={t('nav.languageSwitchTo')}
+          aria-busy={languageSaving}
+          disabled={languageSaving}
         >
           {settings.language === 'ar' ? t('nav.languageCodeEnglish') : t('nav.languageCodeArabic')}
         </button>
       </header>
+
+      {languageError && (
+        <p className="app-error" role="alert">
+          {t('settings.saveFailed')}
+        </p>
+      )}
 
       <nav className="app-nav" aria-label={t('app.name')}>
         {tabs.map((tab) => (

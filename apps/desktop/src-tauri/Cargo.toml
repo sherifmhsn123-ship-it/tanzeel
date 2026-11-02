@@ -9,6 +9,11 @@ description = "Tanzeel desktop shell (Tauri)"
 name = "tanzeel_desktop_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+[[bin]]
+name = "tanzeel-desktop"
+path = "src/main.rs"
+test = false
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
@@ -17,3 +22,7 @@ tauri = { version = "2", features = [] }
 serde.workspace = true
 tanzeel-core.workspace = true
 tanzeel-storage.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
+tauri = { version = "2", features = ["test"] }

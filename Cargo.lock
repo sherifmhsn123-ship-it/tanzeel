@@ -3069,6 +3069,7 @@ name = "tanzeel-desktop"
 version = "0.1.0"
 dependencies = [
  "serde",
+ "serde_json",
  "tanzeel-core",
  "tanzeel-storage",
  "tauri",
