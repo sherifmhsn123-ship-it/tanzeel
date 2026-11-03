@@ -45,7 +45,7 @@
 ## CI
 
 - نجح CI في PR #8 على Windows وLinux وmacOS 15 Intel، إضافة إلى Docs وSecurity وPR body policy.
-- استُخدم `macos-15-intel` بعد أن ألغى GitHub وظائف `macos-latest` و`macos-15` (arm64) وهي في الطابور. يحافظ ذلك على تغطية macOS لكنه لا يغطي arm64.
+- استُخدم runner `macos-15-intel` بعد أن ألغى GitHub وظائف `macos-latest` و`macos-15` (arm64) وهي في الطابور، مع إبقاء اسمي الفحصين `Foundation (macos-latest)` و`Build & test (macos-latest)` للتوافق مع حماية الفرع. يحافظ ذلك على تغطية macOS لكنه لا يغطي arm64.
 - نجحت الوظائف: Foundation على الأنظمة الثلاثة، وBuild & test على Windows وLinux وmacOS 15 Intel.
 
 ## ما لم يُختبر

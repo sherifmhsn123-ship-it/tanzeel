@@ -40,13 +40,19 @@ jobs:
           fail: true
 
   foundation:
-    name: Foundation (${{ matrix.os }})
+    name: Foundation (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      # The arm64 macOS pool was cancelling queued jobs; the Intel image keeps macOS coverage available.
+      # Keep required check names stable; macOS runs on Intel because the arm64 pool was cancelling queued jobs.
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-15-intel]
+        include:
+          - os: ubuntu-latest
+            name: ubuntu-latest
+          - os: windows-latest
+            name: windows-latest
+          - os: macos-15-intel
+            name: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -94,13 +100,19 @@ jobs:
           echo "Found $count ADR files."
 
   build-test:
-    name: Build & test (${{ matrix.os }})
+    name: Build & test (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      # The arm64 macOS pool was cancelling queued jobs; the Intel image keeps macOS coverage available.
+      # Keep required check names stable; macOS runs on Intel because the arm64 pool was cancelling queued jobs.
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-15-intel]
+        include:
+          - os: ubuntu-latest
+            name: ubuntu-latest
+          - os: windows-latest
+            name: windows-latest
+          - os: macos-15-intel
+            name: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
