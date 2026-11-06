@@ -86,6 +86,7 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .app-brand {
@@ -107,7 +108,15 @@ button {
   color: var(--muted);
 }
 
-.language-button {
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.language-button,
+.theme-button {
   min-inline-size: 52px;
   padding-inline: 14px;
   padding-block: 8px;
@@ -117,11 +126,13 @@ button {
   color: var(--text);
 }
 
-.language-button:hover {
+.language-button:hover,
+.theme-button:hover {
   border-color: var(--accent);
 }
 
-.language-button:disabled {
+.language-button:disabled,
+.theme-button:disabled {
   cursor: default;
   opacity: 0.7;
 }
@@ -239,6 +250,7 @@ button {
 .field input:focus-visible,
 .field select:focus-visible,
 .language-button:focus-visible,
+.theme-button:focus-visible,
 .nav-button:focus-visible,
 .form-actions button:focus-visible {
   outline: 2px solid var(--accent);

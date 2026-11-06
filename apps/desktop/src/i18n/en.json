@@ -10,7 +10,9 @@
     "about": "About",
     "languageSwitchTo": "Switch to Arabic",
     "languageCodeArabic": "ع",
-    "languageCodeEnglish": "EN"
+    "languageCodeEnglish": "EN",
+    "themeSwitchToLight": "Switch to light theme",
+    "themeSwitchToDark": "Switch to dark theme"
   },
   "home": {
     "title": "Welcome to Tanzeel",

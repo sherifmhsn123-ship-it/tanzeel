@@ -10,7 +10,9 @@
     "about": "حول",
     "languageSwitchTo": "التبديل إلى الإنجليزية",
     "languageCodeArabic": "ع",
-    "languageCodeEnglish": "EN"
+    "languageCodeEnglish": "EN",
+    "themeSwitchToLight": "التبديل إلى المظهر الفاتح",
+    "themeSwitchToDark": "التبديل إلى المظهر الداكن"
   },
   "home": {
     "title": "مرحبًا بك في تنزيل",
