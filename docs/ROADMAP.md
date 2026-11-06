@@ -4,7 +4,7 @@
 | --- | --- |
 | الإصدار | 0.3 (مسودة) |
 | التاريخ | 2026-10-31 |
-| الحالة | قيد التنفيذ — المرحلة 1 معتمدة، والمراحل اللاحقة مقترحة |
+| الحالة | قيد التنفيذ — المرحلة 2 بدأت، والمراحل اللاحقة مقترحة |
 | القاعدة | لا تبدأ مرحلة قبل قبول المرحلة السابقة ونجاح اختباراتها |
 
 > **تنبيه:** هذه خارطة طريق مخططة، لا إنجازات. كل شرط نجاح هو اختبار مطلوب، وليس نتيجة مختبرة. ما لم يُنفَّذ يُكتب عنه: **لم يُختبر**.
@@ -17,7 +17,7 @@
 | --- | --- | --- | --- |
 | 0 | الأساس والحوكمة | وثائق + CI + حماية فرع | مكتمل — مدموج في PR #2 |
 | 1 | الهيكل واللغة والإعدادات | تطبيق يفتح، عربي/إنجليزي، إعدادات محفوظة | مكتمل — مدموج في PR #8 |
-| 2 | الملفات المباشرة والتسريع | تنزيل HTTP متعدد الأجزاء مع استئناف وإلغاء | مخطط |
+| 2 | الملفات المباشرة والتسريع | تنزيل HTTP متعدد الأجزاء مع استئناف وإلغاء | قيد التنفيذ — بدأ 2026-11-06 |
 | 3 | يوتيوب (فيديو واحد) | تنزيل فيديو حقيقي واحد موثّق | مخطط |
 | 4 | قائمة الانتظار والجدولة والسجل | مهام تنجو من إعادة التشغيل وتُنفَّذ في وقتها | مخطط |
 | 5 | القوائم والترجمة والصوت | قوائم تشغيل، ترجمات، استخراج صوت | مخطط |
@@ -123,6 +123,8 @@
 
 **الهدف:** تنزيل ملف `HTTP/HTTPS` موثوق، مع تقدم واستئناف وإلغاء وإعادة محاولة، وتسريع اختياري متعدد الأجزاء، دون أي منصة فيديو.
 
+> **الحالة (2026-11-06):** بُنيت نواة تنزيل مباشر أحادية الاتصال في `crates/tanzeel-download` مع اختبارات خادم وهمي محلي. الواجهة وIPC والتخزين **لم تُوصل بعد**، والتسريع متعدد الأجزاء **لم يُبنَ** وينتظر اعتماد `ADR-0010`. ما لم يُذكر أنه مختبر فهو **لم يُختبر**.
+
 **يتضمن:**
 
 - محمّل HTTP في Rust.
@@ -140,22 +142,22 @@
 
 **شرط النجاح (اختبارات محددة):**
 
-- [ ] `download_success` ينجح ويطابق البصمة.
-- [ ] `download_resume_after_interruption` يكمل من نقطة التوقف عند دعم `Range`.
-- [ ] `download_restart_when_no_range` يعيد البدء بأمان دون تلف.
-- [ ] `download_cancel_cleans_partial` يلغي وينظّف.
-- [ ] `download_404_returns_not_found` و`download_500_retries` ينجحان.
-- [ ] `download_disk_full` يعطي خطأ واضحًا ولا يتلف ملفات أخرى (محاكاة).
-- [ ] `sanitize_windows_reserved_names` و`sanitize_path_traversal` ينجحان.
-- [ ] `redirect_to_file_scheme_rejected` و`private_ip_rejected_by_default` ينجحان.
-- [ ] `progress_events_are_throttled` يتحقق من عدم إغراق الواجهة.
-- [ ] `segmented_download_matches_hash` ينجح بخادم وهمي يدعم `Range`.
-- [ ] `segments_resume_after_restart` يستأنف الأجزاء الناقصة فقط.
-- [ ] `etag_change_restarts_safely` ينجح دون تقديم ملف تالف.
-- [ ] `server_without_range_falls_back` يستخدم اتصالًا واحدًا.
-- [ ] `per_host_and_global_limits_respected` ينجح.
-- [ ] `429_backs_off_segments` يقلل الاتصالات ويحترم `Retry-After`.
-- [ ] لا شبكة حقيقية في CI.
+- [x] `download_success` ينجح ويطابق البصمة.
+- [x] `download_resume_after_interruption` يكمل من نقطة التوقف عند دعم `Range`.
+- [x] `download_restart_when_no_range` يعيد البدء بأمان دون تلف.
+- [x] `download_cancel_cleans_partial` يلغي وينظّف.
+- [x] `download_404_returns_not_found` و`download_500_retries` ينجحان.
+- [ ] `download_disk_full` يعطي خطأ واضحًا ولا يتلف ملفات أخرى (محاكاة). تحويل خطأ الامتلاء مختبر؛ محاكاة الامتلاء الفعلي **لم تُختبر**.
+- [x] `sanitize_windows_reserved_names` و`sanitize_path_traversal` ينجحان.
+- [x] `redirect_to_file_scheme_rejected` و`private_ip_rejected_by_default` ينجحان.
+- [x] `progress_events_are_throttled` يتحقق من عدم إغراق الواجهة.
+- [ ] `segmented_download_matches_hash` ينجح بخادم وهمي يدعم `Range`. **لم يُبنَ بعد**.
+- [ ] `segments_resume_after_restart` يستأنف الأجزاء الناقصة فقط. **لم يُبنَ بعد**.
+- [x] `etag_change_restarts_safely` ينجح دون تقديم ملف تالف.
+- [x] `server_without_range_falls_back` يستخدم اتصالًا واحدًا (يغطيه `download_restart_when_no_range`).
+- [ ] `per_host_and_global_limits_respected` ينجح. **لم يُبنَ بعد**.
+- [ ] `429_backs_off_segments` يقلل الاتصالات ويحترم `Retry-After`. التراجع أحادي الاتصال مختبر؛ سلوك الأجزاء **لم يُبنَ بعد**.
+- [x] لا شبكة حقيقية في CI.
 
 **خارج المرحلة:**
 

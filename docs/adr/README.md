@@ -19,6 +19,7 @@
 | [0011](0011-browser-integration.md) | تكامل المتصفح | مقترح | WebExtension + Native Messaging، بلا منفذ |
 | [0012](0012-scheduling.md) | الجدولة | مقترح | جدولة داخل التطبيق في SQLite |
 | [0013](0013-bounded-site-grabber.md) | سحب الموقع المحدود | مقترح | صفحة واحدة، نطاق واحد، احترام `robots.txt` |
+| [0014](0014-http-client.md) | مكتبة HTTP | مقترح | `reqwest` blocking + `rustls` للمرحلة 2 |
 
 ## قالب ورقة جديدة
 
