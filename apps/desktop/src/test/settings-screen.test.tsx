@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App';
 import i18n, { applyLanguage } from '../i18n';
 import ar from '../i18n/ar.json';
@@ -43,6 +43,42 @@ describe('settings screen', () => {
     expect(parsed.downloadDir).toBe('D:\\Downloads');
     expect(parsed.theme).toBe('dark');
     await waitFor(() => expect(document.documentElement.dataset.theme).toBe('dark'));
+  });
+
+  it('applies and saves the theme as soon as it is selected', async () => {
+    const user = await openSettings();
+    const themeSelect = screen.getByLabelText(ar.settings.theme);
+
+    await user.selectOptions(themeSelect, 'dark');
+    await waitFor(() => expect(document.documentElement.dataset.theme).toBe('dark'));
+    expect(
+      (JSON.parse(window.localStorage.getItem(SETTINGS_STORAGE_KEY) as string) as { theme: string })
+        .theme,
+    ).toBe('dark');
+
+    await user.selectOptions(themeSelect, 'light');
+    await waitFor(() => expect(document.documentElement.dataset.theme).toBe('light'));
+    expect(
+      (JSON.parse(window.localStorage.getItem(SETTINGS_STORAGE_KEY) as string) as { theme: string })
+        .theme,
+    ).toBe('light');
+
+    await user.selectOptions(themeSelect, 'system');
+    await waitFor(() => expect(document.documentElement.dataset.theme).toBeUndefined());
+  });
+
+  it('reverts and reports when the selected theme cannot be saved', async () => {
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('storage unavailable');
+    });
+    const user = await openSettings();
+    const themeSelect = screen.getByLabelText(ar.settings.theme);
+
+    await user.selectOptions(themeSelect, 'dark');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(ar.settings.saveFailed);
+    expect(document.documentElement.dataset.theme).toBeUndefined();
+    expect(themeSelect).toHaveValue('system');
   });
 
   it('rejects a relative folder path without saving', async () => {

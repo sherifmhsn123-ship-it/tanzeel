@@ -47,8 +47,13 @@ export default function SettingsPage({ settings, onSave }: SettingsPageProps) {
   };
 
   const changeTheme = (event: ChangeEvent<HTMLSelectElement>) => {
-    setDraft({ ...draft, theme: event.target.value as Theme });
-    setState('idle');
+    const next: Settings = { ...draft, theme: event.target.value as Theme };
+    setDraft(next);
+    void persist(next).then((saved) => {
+      if (!saved) {
+        setDraft(settings);
+      }
+    });
   };
 
   const changeDownloadDir = (event: ChangeEvent<HTMLInputElement>) => {
