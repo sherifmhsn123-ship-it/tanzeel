@@ -1,0 +1,21 @@
+[package]
+name = "tanzeel-download"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Direct HTTP download engine for Tanzeel"
+
+[dependencies]
+hex.workspace = true
+percent-encoding.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+tanzeel-core.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+hex.workspace = true
+sha2.workspace = true
+tempfile = "3"
